@@ -46,9 +46,9 @@ export interface Country {
     profesion: Profession;
     tipo_resultado: number;
     fecha_nacimiento: string | null;
+    tipo: number;
   }
-  
-// src/interfaces/user.ts (actualizado)
+
 
 
 // export const login = async (

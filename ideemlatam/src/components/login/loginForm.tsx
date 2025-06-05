@@ -1,39 +1,35 @@
 
+// // src/components/login/loginForm.tsx
+// "use client";
 
-// import { useState } from "react"
-// import { useRouter } from "next/navigation"
-// import { login } from "@/api/auth"
-// import { Mail, Lock, Eye, EyeOff } from "lucide-react"
+// import { useState } from "react";
+// import { Mail, Lock, Eye, EyeOff } from "lucide-react";
+// import { useLogin } from "@/hooks/useLogin";
 
 // export default function LoginForm() {
-//   const [email, setEmail] = useState("")
-//   const [password, setPassword] = useState("")
-//   const [showPassword, setShowPassword] = useState(false)
-//   const [error, setError] = useState("")
-//   const [loading, setLoading] = useState(false)
-//   const router = useRouter()
+//   const { handleLogin, isLoading, error } = useLogin();
+//   const [email, setEmail] = useState("");
+//   const [password, setPassword] = useState("");
+//   const [showPassword, setShowPassword] = useState(false);
 
-//   const handleSubmit = async (e: React.FormEvent) => {
-//     e.preventDefault()
-    
+//   const onSubmit = async (e: React.FormEvent) => {
+//     e.preventDefault();
+
+//     console.log("▶️ onSubmit fired", { email, password });
+//     e.preventDefault();
+
 //     if (!email || !password) {
-//       setError("Por favor complete todos los campos")
-//       return
+//       // Puedes personalizar este mensaje o delegarlo al hook
+//       return;
 //     }
 
-//     setError("")
-//     setLoading(true)
+//     await handleLogin(email, password);
+//     // La navegación al dashboard la realiza el hook internamente
+//   };
+// "use client";
+// console.log("🔹 LoginForm render");
 
-//     try {
-//       const data = await login(email, password)
-//       localStorage.setItem("user", JSON.stringify(data))
-//       router.push("/dashboard/page")
-//     } catch (err) {
-//       setError(err instanceof Error ? err.message : "Error al iniciar sesión")
-//     } finally {
-//       setLoading(false)
-//     }
-//   }
+
 
 //   return (
 //     <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-b from-customBlue to-customSkyBlue">
@@ -47,7 +43,7 @@
 //           />
 //         </div>
 
-//         <form onSubmit={handleSubmit} className="space-y-6" noValidate>
+//         <form onSubmit={onSubmit} className="space-y-6" noValidate>
 //           <div className="space-y-3">
 //             <label htmlFor="email" className="text-base font-medium text-customBlue">
 //               Correo electrónico
@@ -63,7 +59,7 @@
 //                 value={email}
 //                 onChange={(e) => setEmail(e.target.value)}
 //                 className="w-full border border-customSkyBlue/30 rounded-lg pl-12 pr-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-customBlue"
-//                 disabled={loading}
+//                 disabled={isLoading}
 //                 autoComplete="email"
 //               />
 //             </div>
@@ -84,7 +80,7 @@
 //                 value={password}
 //                 onChange={(e) => setPassword(e.target.value)}
 //                 className="w-full border border-customSkyBlue/30 rounded-lg pl-12 pr-12 py-3 text-base focus:outline-none focus:ring-2 focus:ring-customBlue"
-//                 disabled={loading}
+//                 disabled={isLoading}
 //                 autoComplete="current-password"
 //               />
 //               <button
@@ -92,6 +88,7 @@
 //                 onClick={() => setShowPassword(!showPassword)}
 //                 className="absolute right-4 top-1/2 -translate-y-1/2 text-customGray hover:text-customBlue"
 //                 aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+//                 disabled={isLoading}
 //               >
 //                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
 //               </button>
@@ -100,10 +97,10 @@
 
 //           <button
 //             type="submit"
-//             disabled={loading}
+//             disabled={isLoading}
 //             className="w-full bg-customBlue hover:bg-customBluemid text-white py-3 rounded-lg text-base font-medium transition disabled:opacity-50 disabled:cursor-not-allowed"
 //           >
-//             {loading ? "Accediendo..." : "Acceder"}
+//             {isLoading ? "Accediendo..." : "Acceder"}
 //           </button>
 
 //           {error && (
@@ -113,11 +110,11 @@
 //           )}
 
 //           <div className="text-center text-sm">
-//             <a 
-//               href="#" 
+//             <a
+//               href="#"
 //               className="text-customBlue hover:text-customBluemid transition-colors"
-//               aria-disabled={loading}
-//               tabIndex={loading ? -1 : 0}
+//               aria-disabled={isLoading}
+//               tabIndex={isLoading ? -1 : 0}
 //             >
 //               ¿Olvidó su contraseña?
 //             </a>
@@ -125,42 +122,34 @@
 //         </form>
 //       </div>
 //     </div>
-//   )
+//   );
 // }
 
 
 
-// src/components/login/loginForm.tsx
+// src/components/login/LoginForm.tsx
 "use client";
 
 import { useState } from "react";
-import { Mail, Lock, Eye, EyeOff } from "lucide-react";
+import { User, Users, Lock, Eye, EyeOff } from "lucide-react";
 import { useLogin } from "@/hooks/useLogin";
 
 export default function LoginForm() {
   const { handleLogin, isLoading, error } = useLogin();
-  const [email, setEmail] = useState("");
+
+  // 0 = Docente, 1 = Estudiante, 4 = Usuario
+  const [tipo, setTipo] = useState<0 | 1 | 4>(0);
+  const [usuario, setUsuario] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("▶️ onSubmit fired", { tipo, usuario, password });
 
-    console.log("▶️ onSubmit fired", { email, password });
-    e.preventDefault();
-
-    if (!email || !password) {
-      // Puedes personalizar este mensaje o delegarlo al hook
-      return;
-    }
-
-    await handleLogin(email, password);
-    // La navegación al dashboard la realiza el hook internamente
+    if (!usuario || !password) return;
+    await handleLogin(usuario, password, tipo);
   };
-"use client";
-console.log("🔹 LoginForm render");
-
-
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-b from-customBlue to-customSkyBlue">
@@ -175,27 +164,31 @@ console.log("🔹 LoginForm render");
         </div>
 
         <form onSubmit={onSubmit} className="space-y-6" noValidate>
+       
+
+          {/* Campo de Usuario */}
           <div className="space-y-3">
-            <label htmlFor="email" className="text-base font-medium text-customBlue">
-              Correo electrónico
+            <label htmlFor="usuario" className="text-base font-medium text-customBlue">
+              Usuario
             </label>
             <div className="relative">
               <span className="absolute left-4 top-1/2 -translate-y-1/2 text-customGray">
-                <Mail size={20} />
+                <User size={20} />
               </span>
               <input
-                id="email"
-                type="email"
-                placeholder="Ingrese su correo"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full border border-customSkyBlue/30 rounded-lg pl-12 pr-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-customBlue"
+                id="usuario"
+                type="text"
+                placeholder="Ingrese su usuario"
+                value={usuario}
+                onChange={(e) => setUsuario(e.target.value)}
                 disabled={isLoading}
-                autoComplete="email"
+                autoComplete="username"
+                className="w-full border border-customSkyBlue/30 rounded-lg pl-12 pr-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-customBlue"
               />
             </div>
           </div>
 
+          {/* Campo de Contraseña */}
           <div className="space-y-3">
             <label htmlFor="password" className="text-base font-medium text-customBlue">
               Contraseña
@@ -210,22 +203,46 @@ console.log("🔹 LoginForm render");
                 placeholder="Ingrese su contraseña"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full border border-customSkyBlue/30 rounded-lg pl-12 pr-12 py-3 text-base focus:outline-none focus:ring-2 focus:ring-customBlue"
                 disabled={isLoading}
                 autoComplete="current-password"
+                className="w-full border border-customSkyBlue/30 rounded-lg pl-12 pr-12 py-3 text-base focus:outline-none focus:ring-2 focus:ring-customBlue"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-customGray hover:text-customBlue"
-                aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
                 disabled={isLoading}
+                aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-customGray hover:text-customBlue"
               >
                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
             </div>
           </div>
 
+             {/* Select de Rol */}
+             <div className="space-y-3">
+            <label htmlFor="tipo" className="text-base font-medium text-customBlue">
+              Rol
+            </label>
+            <div className="relative">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-customGray">
+                <Users size={20} />
+              </span>
+              <select
+                id="tipo"
+                value={tipo}
+                onChange={(e) => setTipo(parseInt(e.target.value, 10) as 0 | 1 | 4)}
+                disabled={isLoading}
+                className="w-full border border-customSkyBlue/30 rounded-lg pl-12 pr-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-customBlue bg-white appearance-none"
+              >
+                <option value={0}>Docente</option>
+                <option value={1}>Estudiante</option>
+                <option value={4}>Usuario</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Botón de Acceso */}
           <button
             type="submit"
             disabled={isLoading}
@@ -243,9 +260,9 @@ console.log("🔹 LoginForm render");
           <div className="text-center text-sm">
             <a
               href="#"
-              className="text-customBlue hover:text-customBluemid transition-colors"
-              aria-disabled={isLoading}
               tabIndex={isLoading ? -1 : 0}
+              aria-disabled={isLoading}
+              className="text-customBlue hover:text-customBluemid transition-colors"
             >
               ¿Olvidó su contraseña?
             </a>

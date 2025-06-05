@@ -13,6 +13,14 @@ export const ENDPOINTS = {
     COMPANY: () => `${BASE_URL}empresa`,
     MEDIO_PUBLICITARIO: () => `${BASE_URL}medio-publicitario`,
     STUDY: () => `${BASE_URL}estudio`,
+    SCHEDULE: () => `${BASE_URL}horario`,
+    DAYS: () => `${BASE_URL}dia`,
+    CONVOCATORIA: () => `${BASE_URL}convocatoria`,
+    ESPACIO: () => `${BASE_URL}espacio`,
+    TEACHER_DATA: () => `${BASE_URL}docente/`,
+    STUDENT_DATA: () => `${BASE_URL}estudiante/`,
+    STUDENT_DATA_EDIT: () => `${BASE_URL}estudiante/editar-perfil`,
+    TEACHER_DATA_EDIT: () => `${BASE_URL}docente/editar-perfil`,
     // PROFESION_LIST: () => `${BASE_URL}profesion?activo=true`,
     
     

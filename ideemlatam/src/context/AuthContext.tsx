@@ -1,3 +1,5 @@
+
+
 // "use client";
 
 // import {
@@ -7,18 +9,19 @@
 //   useState,
 //   useEffect,
 // } from "react";
-// import { useRouter } from "next/router"; // <--- corregido
+// import { useRouter } from "next/router";
 // import { User } from "@/interfaces/userData";
 // import { httpClient } from "@/api/httpClient";
 // import { ENDPOINTS } from "@/api/endpoints";
 // import { hashSHA256 } from "@/util/hash";
 
+// // ✅ Añadido setUser al tipo
 // type AuthContextType = {
 //   user: User | null;
+//   setUser: (user: User) => void;
 //   isAuthenticated: boolean;
-//   isLoaded: boolean; // <--- añadido
+//   isLoaded: boolean;
 //   login: (email: string, password: string) => Promise<void>;
-
 //   logout: () => void;
 // };
 
@@ -26,7 +29,7 @@
 
 // export const AuthProvider = ({ children }: { children: ReactNode }) => {
 //   const [user, setUser] = useState<User | null>(null);
-//   const [isLoaded, setIsLoaded] = useState(false); // <--- añadido
+//   const [isLoaded, setIsLoaded] = useState(false);
 //   const router = useRouter();
 
 //   // Carga inicial de sesión
@@ -37,24 +40,23 @@
 //     if (token && userData) {
 //       setUser(JSON.parse(userData));
 //     }
-//     setIsLoaded(true); // <-- marcamos cargado
+//     setIsLoaded(true);
 //   }, []);
 
 //   const login = async (email: string, password: string) => {
-
 //     const hashedPassword = await hashSHA256(password);
-//     const hashedHex = await hashSHA256(password);                // ej. "a3f5…e9b0"
-//     const hashedBase64 = Buffer.from(hashedHex, 'hex').toString('base64');
+//     const hashedHex = await hashSHA256(password);
+//     const hashedBase64 = Buffer.from(hashedHex, "hex").toString("base64");
+
 //     const response = await httpClient<User>(ENDPOINTS.LOGIN(), {
 //       method: "POST",
-//       body: JSON.stringify({ usuario: email, clave: hashedBase64 }),
+//       body: JSON.stringify({ usuario: email, clave: hashedBase64, tipo:4 }),
 //     });
 
 //     console.log("📤 Enviando POST a", ENDPOINTS.LOGIN(), "con body:", {
 //       email,
 //       hashedBase64,
 //     });
-//     // console.log("✅ AuthProvider.login – usuario:", response);
 
 //     localStorage.setItem("authToken", response.sesion);
 //     localStorage.setItem("userData", JSON.stringify(response));
@@ -73,10 +75,11 @@
 //     <AuthContext.Provider
 //       value={{
 //         user,
+//         setUser, // ✅ Añadido al context
 //         login,
 //         logout,
 //         isAuthenticated: !!user,
-//         isLoaded, // <--- incluido
+//         isLoaded,
 //       }}
 //     >
 //       {children}
@@ -91,6 +94,8 @@
 //   return context;
 // };
 
+
+// src/context/AuthContext.tsx
 "use client";
 
 import {
@@ -106,13 +111,13 @@ import { httpClient } from "@/api/httpClient";
 import { ENDPOINTS } from "@/api/endpoints";
 import { hashSHA256 } from "@/util/hash";
 
-// ✅ Añadido setUser al tipo
+// ✅ Ahora login recibe email, password y role
 type AuthContextType = {
   user: User | null;
   setUser: (user: User) => void;
   isAuthenticated: boolean;
   isLoaded: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string, role: number) => Promise<void>;
   logout: () => void;
 };
 
@@ -127,27 +132,41 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const token = localStorage.getItem("authToken");
     const userData = localStorage.getItem("userData");
-
     if (token && userData) {
       setUser(JSON.parse(userData));
     }
     setIsLoaded(true);
   }, []);
 
-  const login = async (email: string, password: string) => {
-    const hashedPassword = await hashSHA256(password);
+  const login = async (
+    email: string,
+    password: string,
+    role: number
+  ): Promise<void> => {
+    // Hash de la contraseña
     const hashedHex = await hashSHA256(password);
     const hashedBase64 = Buffer.from(hashedHex, "hex").toString("base64");
 
+    // Envía el rol dinámico en la propiedad "tipo"
     const response = await httpClient<User>(ENDPOINTS.LOGIN(), {
       method: "POST",
-      body: JSON.stringify({ usuario: email, clave: hashedBase64 }),
+      body: JSON.stringify({
+        usuario: email,
+        clave: hashedBase64,
+        tipo: role,
+      }),
     });
 
-    console.log("📤 Enviando POST a", ENDPOINTS.LOGIN(), "con body:", {
-      email,
-      hashedBase64,
-    });
+    console.log(
+      "📤 Enviando POST a",
+      ENDPOINTS.LOGIN(),
+      "con body:",
+      {
+        usuario: email,
+        clave: hashedBase64,
+        tipo: role,
+      }
+    );
 
     localStorage.setItem("authToken", response.sesion);
     localStorage.setItem("userData", JSON.stringify(response));
@@ -166,7 +185,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     <AuthContext.Provider
       value={{
         user,
-        setUser, // ✅ Añadido al context
+        setUser,
         login,
         logout,
         isAuthenticated: !!user,

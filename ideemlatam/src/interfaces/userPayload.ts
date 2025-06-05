@@ -10,8 +10,9 @@ export interface UserPayload {
     profesion: number;
     perfil:  number ;
     telefono?: string | null;
+    foto?: string | null;
     fecha_nacimiento?: string | null;
 
  
-  }
-  
+}
+
